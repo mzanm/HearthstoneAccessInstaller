@@ -11,9 +11,11 @@ static class Program
     [STAThread]
     static void Main()
     {
+        # if !DEBUG
         Application.SetUnhandledExceptionMode(UnhandledExceptionMode.CatchException);
         Application.ThreadException += HandleThreadException;
         AppDomain.CurrentDomain.UnhandledException += HandleDomainException;
+        #endif
         ApplicationConfiguration.Initialize();
         Application.Run(new MainForm());
     }

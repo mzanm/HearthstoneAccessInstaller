@@ -5,6 +5,8 @@ using System.Windows.Forms;
 namespace HSAPatcher;
 public class MainForm : Form
 {
+    private UpdateClient updateClient = null!;
+    private ReleaseChannel[] releaseChannels = new ReleaseChannel[5];
     private TextBox directoryBox = null!;
     private ComboBox cmbChannels = null!;
     private Button btnStart = null!;
@@ -13,7 +15,10 @@ public class MainForm : Form
 
     public MainForm()
     {
+        this.Enabled = false;
+        this.Visible = false;
         InitializeComponent();
+        this.Load += onFormLoad;
     }
 
     private void InitializeComponent()
@@ -41,26 +46,14 @@ public class MainForm : Form
         lblPath.AutoSize = true;
 
         directoryBox = new TextBox();
-        directoryBox.Width = 250;
         directoryBox.ReadOnly = true;
+        directoryBox.AutoSize = true;
+        directoryBox.Width = 250;
 
         Button btnBrowse = new Button();
         btnBrowse.Text = "Change:";
         btnBrowse.AutoSize = true;
-        btnBrowse.Click += (s, e) =>
-        {
-            using (FolderBrowserDialog dialog = new FolderBrowserDialog())
-            {
-                dialog.Description = "Select the folder where Hearthstone is installed:";
-                dialog.ShowNewFolderButton = false;
-                dialog.OkRequiresInteraction = true;
-                dialog.UseDescriptionForTitle = true;
-                if (dialog.ShowDialog() == DialogResult.OK)
-                {
-                    directoryBox.Text = dialog.SelectedPath;
-                }
-            }
-        };
+        btnBrowse.Click += onBrowse;
 
         pickerPanel.Controls.Add(lblPath);
         pickerPanel.Controls.Add(directoryBox);
@@ -83,10 +76,7 @@ public class MainForm : Form
         cmbChannels.DropDownStyle = ComboBoxStyle.DropDownList;
         cmbChannels.Width = 200;
 
-        foreach (Source source in SourceManager.Sources)
-        {
-            cmbChannels.Items.Add(source.name);
-        }
+
 
         comboPanel.Controls.Add(lblSelect);
         comboPanel.Controls.Add(cmbChannels);
@@ -102,6 +92,26 @@ public class MainForm : Form
 
         mainPanel.Controls.Add(operationPanel);
         this.Controls.Add(mainPanel);
+
+    }
+
+    private async void onFormLoad(object? sender, EventArgs e)
+    {
+        updateClient = new UpdateClient();
+        releaseChannels = await updateClient.GetReleaseChannels();
+        if (releaseChannels == null)
+        {
+            MessageBox.Show("Unable to communicate with the update server", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            Application.Exit();
+            return;
+        }
+
+        foreach (ReleaseChannel? channel in releaseChannels)
+        {
+            cmbChannels.Items.Add(channel.Name);
+        }
+
+
         string? path = Patcher.LocateHearthstone();
         if (!string.IsNullOrWhiteSpace(path))
         {
@@ -113,9 +123,24 @@ public class MainForm : Form
         }
 
         cmbChannels.SelectedIndex = 0;
-
+        this.Enabled = true;
+        this.Visible = true;
     }
 
+    private void onBrowse(object? sender, EventArgs e)
+    {
+        using (FolderBrowserDialog dialog = new FolderBrowserDialog())
+        {
+            dialog.Description = "Select the folder where Hearthstone is installed:";
+            dialog.ShowNewFolderButton = false;
+            dialog.OkRequiresInteraction = true;
+            dialog.UseDescriptionForTitle = true;
+            if (dialog.ShowDialog() == DialogResult.OK)
+            {
+                directoryBox.Text = dialog.SelectedPath;
+            }
+        }
+    }
     private async void BtnStart_Click(object? sender, EventArgs e)
     {
         string directory = directoryBox.Text;
@@ -130,21 +155,21 @@ public class MainForm : Form
             MessageBox.Show(this, "No release channel is  selected. Please select a channel.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             return;
         }
-        Source source = SourceManager.Sources[cmbChannels.SelectedIndex];
+        ReleaseChannel channel = releaseChannels[cmbChannels.SelectedIndex];
 
         // Disable Start button to prevent multiple clicks
         btnStart.Enabled = false;
         operationPanel.AddHistoryItem($"Selected HearthstoneDirectory: {directory}");
-        operationPanel.AddHistoryItem($"Selected channel: {source.name}, at {source.url}");
+        operationPanel.AddHistoryItem($"Selected channel: {channel.Name}, at {channel.Latest_Release.Url}");
         operationPanel.LabelText = "Downloading...";
-        Downloader downloader = new Downloader(source.url);
+        Downloader downloader = new Downloader(channel.Latest_Release.Url);
 
         downloader.ProgressChanged += (sender, progress) =>
         {
             operationPanel.UpdateProgress(progress, "Downloading...");
         };
         using Stream stream = await downloader.Download();
-        operationPanel.LabelText= "Patching...";
+        operationPanel.LabelText = "Patching...";
         await Task.Yield();
         Patcher.UnpackAndPatch(stream, directory);
 
