@@ -9,14 +9,13 @@
     <Nullable>enable</Nullable>
     <RootNamespace>HSAPatcher</RootNamespace>
     <UseWindowsForms>true</UseWindowsForms>
-    <PropertyGroup Condition="'$(Configuration)' == 'Release'">
-      <Platform>x86</Platform>
-      <PlatformTarget>x86</PlatformTarget>
-      <RuntimeIdentifier>win-x86</RuntimeIdentifier>
-    </PropertyGroup>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)'=='Release'">
+    <Platform>x86</Platform>
+    <PlatformTarget>x86</PlatformTarget>
+    <RuntimeIdentifier>win-x86</RuntimeIdentifier>
+
     <DebugType>none</DebugType>
     <DebuggerSupport>false</DebuggerSupport>
   </PropertyGroup>
