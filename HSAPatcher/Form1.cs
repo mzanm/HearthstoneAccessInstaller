@@ -8,13 +8,14 @@ public class MainForm : Form
     private UpdateClient updateClient = null!;
     private ReleaseChannel[] releaseChannels = new ReleaseChannel[5];
     private TextBox directoryBox = null!;
-    private ComboBox cmbChannels = null!;
+    private ListView channelsList = null!;
     private Button btnStart = null!;
     private FlowLayoutPanel mainPanel = null!;
     private OperationPanel operationPanel = null!;
 
     public MainForm()
     {
+        // ensure form is disabled until it's done loading, reenable after it loads.
         this.Enabled = false;
         this.Visible = false;
         InitializeComponent();
@@ -23,23 +24,17 @@ public class MainForm : Form
 
     private void InitializeComponent()
     {
-        cmbChannels = new ComboBox();
-        btnStart = new Button();
-        mainPanel = new FlowLayoutPanel();
-
         this.Text = "HSAPatcher";
-        this.Size = new System.Drawing.Size(600, 400);
+        this.AutoSize = true;
         this.StartPosition = FormStartPosition.CenterScreen;
-
+        mainPanel = new FlowLayoutPanel();
         mainPanel.Dock = DockStyle.Fill;
         mainPanel.FlowDirection = FlowDirection.TopDown;
         mainPanel.Padding = new Padding(10);
         mainPanel.AutoSize = true;
-        mainPanel.AutoSizeMode = AutoSizeMode.GrowAndShrink;
-
-        FlowLayoutPanel pickerPanel = new FlowLayoutPanel();
-        pickerPanel.AutoSize = true;
-        pickerPanel.FlowDirection = FlowDirection.LeftToRight;
+        FlowLayoutPanel directoryPanel = new FlowLayoutPanel();
+        directoryPanel.AutoSize = true;
+        directoryPanel.FlowDirection = FlowDirection.LeftToRight;
 
         Label lblPath = new Label();
         lblPath.Text = "Select Folder:";
@@ -48,24 +43,23 @@ public class MainForm : Form
         directoryBox = new TextBox();
         directoryBox.ReadOnly = true;
         directoryBox.AutoSize = true;
-        directoryBox.Width = 250;
+        directoryBox.Width = 200;
 
         Button btnBrowse = new Button();
         btnBrowse.Text = "Change:";
         btnBrowse.AutoSize = true;
         btnBrowse.Click += onBrowse;
 
-        pickerPanel.Controls.Add(lblPath);
-        pickerPanel.Controls.Add(directoryBox);
-        pickerPanel.Controls.Add(btnBrowse);
+        directoryPanel.Controls.Add(lblPath);
+        directoryPanel.Controls.Add(directoryBox);
+        directoryPanel.Controls.Add(btnBrowse);
 
-        mainPanel.Controls.Add(pickerPanel);
+        mainPanel.Controls.Add(directoryPanel);
 
 
-        FlowLayoutPanel comboPanel = new FlowLayoutPanel();
-        comboPanel.FlowDirection = FlowDirection.LeftToRight;
-        comboPanel.AutoSize = true;
-        comboPanel.AutoSizeMode = AutoSizeMode.GrowAndShrink;
+        FlowLayoutPanel channelPanel = new FlowLayoutPanel();
+        channelPanel.FlowDirection = FlowDirection.LeftToRight;
+        channelPanel.AutoSize = true;
 
         Label lblSelect = new Label()
         {
@@ -73,20 +67,30 @@ public class MainForm : Form
             AutoSize = true,
         };
 
-        cmbChannels.DropDownStyle = ComboBoxStyle.DropDownList;
-        cmbChannels.Width = 200;
 
+        channelsList = new ListView()
+        {
+            View = View.Details,
+            FullRowSelect = true,
+            GridLines = true,
+            MultiSelect = false,
+            Size = new System.Drawing.Size(400, 400),
+        };
+        channelsList.Columns.Add("Channel:", -2);
+        channelsList.Columns.Add("Description:", -2);
+        channelsList.Columns.Add("Latest Version:", -2);
+        channelsList.Columns.Add("Released at:", -2);
 
+        channelPanel.Controls.Add(lblSelect);
+        channelPanel.Controls.Add(channelsList);
+        mainPanel.Controls.Add(channelPanel);
 
-        comboPanel.Controls.Add(lblSelect);
-        comboPanel.Controls.Add(cmbChannels);
-
-        btnStart.Text = "Start";
-        btnStart.AutoSize = true;
-        btnStart.Margin = new Padding(0, 10, 0, 0); // Add top margin for spacing
+        btnStart = new Button()
+        {
+            Text = "Start",
+            AutoSize = true,
+        };
         btnStart.Click += BtnStart_Click;
-
-        mainPanel.Controls.Add(comboPanel);
         mainPanel.Controls.Add(btnStart);
         operationPanel = new OperationPanel();
 
@@ -108,9 +112,14 @@ public class MainForm : Form
 
         foreach (ReleaseChannel? channel in releaseChannels)
         {
-            cmbChannels.Items.Add(channel.Name);
+            ListViewItem item = channelsList.Items.Add(channel.Name);
+            item.SubItems.Add(channel.Description);
+            item.SubItems.Add(channel.Latest_Release.Accessibility_Version.ToString());
+            DateTimeOffset? uploadTime = channel.Latest_Release.Upload_Time;
+            if (uploadTime == null) continue;
+            item.SubItems.Add(uploadTime.Value.Date.ToString("d"));
         }
-
+        channelsList.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent);
 
         string? path = Patcher.LocateHearthstone();
         if (!string.IsNullOrWhiteSpace(path))
@@ -122,7 +131,8 @@ public class MainForm : Form
             MessageBox.Show(this, "Could not automatically locate where Hearthstone is installed to apply the patch. On the next screen, please press on the 'change' button and pick where you've installed Hearthstone by choosing the Hearthstone folder.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
         }
 
-        cmbChannels.SelectedIndex = 0;
+        channelsList.Items[0].Selected = true;
+
         this.Enabled = true;
         this.Visible = true;
     }
@@ -150,12 +160,12 @@ public class MainForm : Form
             return;
         }
 
-        if (cmbChannels.SelectedIndex < 0)
+        if (channelsList.SelectedIndices.Count < 1)
         {
             MessageBox.Show(this, "No release channel is  selected. Please select a channel.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             return;
         }
-        ReleaseChannel channel = releaseChannels[cmbChannels.SelectedIndex];
+        ReleaseChannel channel = releaseChannels[channelsList.SelectedIndices[0]];
 
         // Disable Start button to prevent multiple clicks
         btnStart.Enabled = false;
