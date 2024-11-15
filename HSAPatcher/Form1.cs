@@ -75,11 +75,12 @@ public class MainForm : Form
             GridLines = true,
             MultiSelect = false,
             Size = new System.Drawing.Size(400, 400),
+            AccessibleRole = AccessibleRole.List,
         };
-        channelsList.Columns.Add("Channel:", -2);
-        channelsList.Columns.Add("Description:", -2);
-        channelsList.Columns.Add("Latest Version:", -2);
-        channelsList.Columns.Add("Released at:", -2);
+        channelsList.Columns.Add("Channel:");
+        channelsList.Columns.Add("Description:");
+        channelsList.Columns.Add("Latest Version:");
+        channelsList.Columns.Add("Released at:");
 
         channelPanel.Controls.Add(lblSelect);
         channelPanel.Controls.Add(channelsList);
@@ -110,6 +111,7 @@ public class MainForm : Form
             return;
         }
 
+        channelsList.BeginUpdate();
         foreach (ReleaseChannel? channel in releaseChannels)
         {
             ListViewItem item = channelsList.Items.Add(channel.Name);
@@ -119,7 +121,8 @@ public class MainForm : Form
             if (uploadTime == null) continue;
             item.SubItems.Add(uploadTime.Value.Date.ToString("d"));
         }
-        channelsList.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent);
+        channelsList.AutoResizeColumns(ColumnHeaderAutoResizeStyle.HeaderSize);
+        channelsList.EndUpdate();
 
         string? path = Patcher.LocateHearthstone();
         if (!string.IsNullOrWhiteSpace(path))

@@ -1,4 +1,5 @@
 using System;
+using System.ComponentModel;
 using System.Collections.Generic;
 using System.Windows.Forms;
 using System.Windows.Forms.Automation;
@@ -66,6 +67,7 @@ public class OperationPanel : FlowLayoutPanel
         get { return progressBar; }
     }
 
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public string LabelText
     {
         get { return label.Text; }
