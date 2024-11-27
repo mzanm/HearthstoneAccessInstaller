@@ -2,6 +2,7 @@ using System;
 using System.Threading.Tasks;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+
 using System.Net.Http;
 using System.Net.Http.Json;
 using System.Net.Http.Headers;
@@ -20,6 +21,7 @@ public class Release
     }
 }
 
+
 public class ReleaseChannel
 {
     public string Name { get; }
@@ -32,6 +34,13 @@ public class ReleaseChannel
     }
 
 }
+
+[JsonSourceGenerationOptions(GenerationMode = JsonSourceGenerationMode.Metadata, PropertyNameCaseInsensitive =true)]
+[JsonSerializable(typeof(ReleaseChannel[]))]
+internal partial class ChannelsJsonContext : JsonSerializerContext
+{
+}
+
 
 public class UpdateClient
 {
@@ -52,7 +61,7 @@ public class UpdateClient
         using (var response = await httpClient.GetAsync("release-channels"))
         {
             response.EnsureSuccessStatusCode();
-            ReleaseChannel[]? channels = await response.Content.ReadFromJsonAsync<ReleaseChannel[]>();
+            ReleaseChannel[]? channels = await response.Content.ReadFromJsonAsync<ReleaseChannel[]>(ChannelsJsonContext.Default.ReleaseChannelArray);
             if (channels == null) throw new ArgumentNullException();
             return channels;
         }

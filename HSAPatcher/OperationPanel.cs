@@ -37,7 +37,6 @@ public class OperationPanel : FlowLayoutPanel
             Height = 100
         };
 
-        listBox.DataSource = historyItems;
 
         this.Controls.Add(progressBar);
         this.Controls.Add(label);
@@ -49,16 +48,12 @@ public class OperationPanel : FlowLayoutPanel
     public void AddHistoryItem(string item)
     {
         historyItems.Add(item);
-        listBox.DataSource = null;
-        listBox.DataSource = historyItems;
         UpdateVisibility();
     }
 
     public void ClearHistory()
     {
         historyItems.Clear();
-        listBox.DataSource = null;
-        listBox.DataSource = historyItems;
         UpdateVisibility();
     }
 
@@ -102,10 +97,14 @@ public class OperationPanel : FlowLayoutPanel
 
     private void UpdateVisibility()
     {
+        listBox.BeginUpdate();
         bool shouldBeVisible = historyItems.Count > 0;
         if (this.Visible != shouldBeVisible)
         {
             this.Visible = shouldBeVisible;
         }
+        listBox.Items.Clear();
+        listBox.Items.AddRange(historyItems.ToArray());
+        listBox.EndUpdate();
     }
 }
