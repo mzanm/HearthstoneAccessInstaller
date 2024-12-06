@@ -11,6 +11,7 @@ public class Downloader
     public event EventHandler<int>? ProgressChanged;
     public int Progress { get; private set; }
     private int lastPercent;
+    private Stopwatch stopwatch;
     private readonly string url;
     private long downloaded;
     private long length;
@@ -18,6 +19,7 @@ public class Downloader
     public Downloader(string url)
     {
         this.url = url;
+        stopwatch = Stopwatch.StartNew();
     }
 
     async public Task<MemoryStream> Download()
@@ -43,6 +45,9 @@ public class Downloader
 
     private void ReportProgress()
     {
+        if (stopwatch.ElapsedMilliseconds < 250) return;
+        stopwatch.Restart();
+
         if (length > 0 && downloaded > 0)
         {
             int percent = (int)((double)downloaded / (double)length * 100);
