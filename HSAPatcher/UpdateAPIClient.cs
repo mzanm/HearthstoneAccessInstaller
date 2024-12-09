@@ -35,7 +35,7 @@ public class ReleaseChannel
 
 }
 
-[JsonSourceGenerationOptions(GenerationMode = JsonSourceGenerationMode.Metadata, PropertyNameCaseInsensitive =true)]
+[JsonSourceGenerationOptions(GenerationMode = JsonSourceGenerationMode.Metadata, PropertyNameCaseInsensitive = true)]
 [JsonSerializable(typeof(ReleaseChannel[]))]
 internal partial class ChannelsJsonContext : JsonSerializerContext
 {
