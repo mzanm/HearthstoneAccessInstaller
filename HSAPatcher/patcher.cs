@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 namespace HSAPatcher;
@@ -42,13 +43,25 @@ static class Patcher
         return null;
     }
 
-    static public void UnpackAndPatch(Stream downloaded, string directory)
+    static public Document[] UnpackAndPatch(Stream downloaded, string directory)
     {
+        List<Document> documents = new();
         using ZipArchive archive = new ZipArchive(downloaded, ZipArchiveMode.Read, false);
         foreach (ZipArchiveEntry entry in archive.Entries)
         {
             string entryPath = entry.FullName;
-            if (String.IsNullOrWhiteSpace(entryPath) || entryPath.EndsWith('/') || !entryPath.StartsWith(PATCH_DIR, StringComparison.OrdinalIgnoreCase)) continue;
+            if (String.IsNullOrWhiteSpace(entryPath) || entryPath.EndsWith('/')) continue;
+            entryPath = entryPath.TrimStart('/');
+            if (!entryPath.Contains('/') && (entryPath.EndsWith("txt", StringComparison.OrdinalIgnoreCase) || entryPath.EndsWith("md", StringComparison.OrdinalIgnoreCase)))
+            {
+                string title = entry.Name;
+                using (StreamReader reader = new(entry.Open()))
+                {
+                    string content = reader.ReadToEnd();
+                    documents.Add(new Document(title, content));
+                }
+            }
+            if (entryPath.StartsWith(PATCH_DIR, StringComparison.OrdinalIgnoreCase)) continue;
             entryPath = entry.FullName.Substring(PATCH_DIR.Length);
             entryPath = Path.Join(entryPath.Split('/'));
             entryPath = Path.Join(directory, entryPath);
@@ -62,5 +75,6 @@ static class Patcher
                 }
             }
         }
+        return documents.ToArray();
     }
 }

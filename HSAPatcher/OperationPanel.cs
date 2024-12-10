@@ -8,7 +8,7 @@ public class OperationPanel : FlowLayoutPanel
 {
     private ProgressBar progressBar;
     private Label label;
-    private ListBox listBox;
+    public ListBox listBox;
     private List<string> historyItems;
 
     public OperationPanel()

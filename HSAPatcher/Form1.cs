@@ -12,6 +12,7 @@ public class MainForm : Form
     private Button btnStart = null!;
     private FlowLayoutPanel mainPanel = null!;
     private OperationPanel operationPanel = null!;
+    private DocumentPanel documentPanel = null!;
 
     public MainForm()
     {
@@ -94,8 +95,10 @@ public class MainForm : Form
         btnStart.Click += BtnStart_Click;
         mainPanel.Controls.Add(btnStart);
         operationPanel = new OperationPanel();
+        documentPanel = new DocumentPanel();
 
         mainPanel.Controls.Add(operationPanel);
+        mainPanel.Controls.Add(documentPanel);
         this.Controls.Add(mainPanel);
 
     }
@@ -156,6 +159,7 @@ public class MainForm : Form
     }
     private async void BtnStart_Click(object? sender, EventArgs e)
     {
+        documentPanel.Reset();
         string directory = directoryBox.Text;
         if (!Patcher.IsHsDirectory(directory))
         {
@@ -184,12 +188,13 @@ public class MainForm : Form
         using Stream stream = await downloader.Download();
         operationPanel.LabelText = "Patching...";
         await Task.Yield();
-        Patcher.UnpackAndPatch(stream, directory);
+        Document[] documents = Patcher.UnpackAndPatch(stream, directory);
+        documentPanel.LoadDocuments(documents);
 
-        operationPanel.LabelText = "Done.";
+        operationPanel.UpdateProgress(100, "Patching Done. You can view the readme and changelog now.");
         // Re-enable Start button
         btnStart.Enabled = true;
-
-        MessageBox.Show("Hearthstone patched!", "Done", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        operationPanel.listBox.Focus();
     }
+
 }
