@@ -27,15 +27,23 @@ public class MainForm : Form
     {
         this.Text = "HSAPatcher";
         this.AutoSize = true;
+        this.AutoSizeMode = AutoSizeMode.GrowAndShrink;
         this.StartPosition = FormStartPosition.CenterScreen;
         mainPanel = new FlowLayoutPanel();
         mainPanel.Dock = DockStyle.Fill;
         mainPanel.FlowDirection = FlowDirection.TopDown;
         mainPanel.Padding = new Padding(10);
         mainPanel.AutoSize = true;
-        FlowLayoutPanel directoryPanel = new FlowLayoutPanel();
-        directoryPanel.AutoSize = true;
-        directoryPanel.FlowDirection = FlowDirection.LeftToRight;
+        mainPanel.AutoSizeMode = AutoSizeMode.GrowAndShrink;
+        mainPanel.WrapContents = false;
+        FlowLayoutPanel directoryPanel = new FlowLayoutPanel
+        {
+            FlowDirection = FlowDirection.LeftToRight,
+            AutoSize = true,
+            AutoSizeMode = AutoSizeMode.GrowAndShrink,
+            WrapContents = false,
+            Padding = new Padding(10),
+        };
 
         Label lblPath = new Label();
         lblPath.Text = "Select Folder:";
@@ -46,9 +54,11 @@ public class MainForm : Form
         directoryBox.AutoSize = true;
         directoryBox.Width = 200;
 
-        Button btnBrowse = new Button();
-        btnBrowse.Text = "Change:";
-        btnBrowse.AutoSize = true;
+        Button btnBrowse = new Button
+        {
+            Text = "Change:",
+            AutoSize = true
+        };
         btnBrowse.Click += onBrowse;
 
         directoryPanel.Controls.Add(lblPath);
@@ -58,9 +68,14 @@ public class MainForm : Form
         mainPanel.Controls.Add(directoryPanel);
 
 
-        FlowLayoutPanel channelPanel = new FlowLayoutPanel();
-        channelPanel.FlowDirection = FlowDirection.LeftToRight;
-        channelPanel.AutoSize = true;
+        FlowLayoutPanel channelPanel = new FlowLayoutPanel
+        {
+            FlowDirection = FlowDirection.LeftToRight,
+            AutoSize = true,
+            AutoSizeMode = AutoSizeMode.GrowAndShrink,
+            WrapContents = false,
+            Padding = new Padding(10),
+        };
 
         Label lblSelect = new Label()
         {
@@ -73,15 +88,16 @@ public class MainForm : Form
         {
             View = View.Details,
             FullRowSelect = true,
+            HeaderStyle = ColumnHeaderStyle.Nonclickable,
             GridLines = true,
             MultiSelect = false,
-            Size = new System.Drawing.Size(400, 400),
             AccessibleRole = AccessibleRole.List,
         };
         channelsList.Columns.Add("Channel:");
         channelsList.Columns.Add("Description:");
         channelsList.Columns.Add("Latest Version:");
         channelsList.Columns.Add("Released at:");
+        channelsList.Columns.Add("Changes:");
 
         channelPanel.Controls.Add(lblSelect);
         channelPanel.Controls.Add(channelsList);
@@ -91,12 +107,12 @@ public class MainForm : Form
         {
             Text = "Start",
             AutoSize = true,
+            Padding = new Padding(10),
         };
         btnStart.Click += BtnStart_Click;
         mainPanel.Controls.Add(btnStart);
         operationPanel = new OperationPanel();
         documentPanel = new DocumentPanel();
-
         mainPanel.Controls.Add(operationPanel);
         mainPanel.Controls.Add(documentPanel);
         this.Controls.Add(mainPanel);
@@ -121,11 +137,38 @@ public class MainForm : Form
             item.SubItems.Add(channel.Description);
             item.SubItems.Add(channel.Latest_Release.Accessibility_Version.ToString());
             DateTimeOffset? uploadTime = channel.Latest_Release.Upload_Time;
-            if (uploadTime == null) continue;
-            item.SubItems.Add(uploadTime.Value.Date.ToString("d"));
+            if (uploadTime == null)
+            {
+                item.SubItems.Add("Unknown");
+            }
+            else
+            {
+                item.SubItems.Add(uploadTime.Value.Date.ToString("d"));
+            }
+            string? changelog = channel.Latest_Release.Changelog;
+            if (string.IsNullOrWhiteSpace(changelog))
+            {
+                item.SubItems.Add("Unknown");
+            }
+            else
+            {
+                item.SubItems.Add(changelog);
+            }
+
+
         }
         channelsList.AutoResizeColumns(ColumnHeaderAutoResizeStyle.HeaderSize);
+        int totalWidth = 0;
+        foreach (ColumnHeader column in channelsList.Columns)
+        {
+            totalWidth += column.Width;
+        }
+        totalWidth += SystemInformation.VerticalScrollBarWidth;
+        totalWidth += 20;
+        channelsList.Width = totalWidth;
         channelsList.EndUpdate();
+        channelsList.PerformLayout();
+        this.PerformLayout();
 
         string? path = Patcher.LocateHearthstone();
         if (!string.IsNullOrWhiteSpace(path))
@@ -157,6 +200,7 @@ public class MainForm : Form
             }
         }
     }
+
     private async void BtnStart_Click(object? sender, EventArgs e)
     {
         documentPanel.Reset();

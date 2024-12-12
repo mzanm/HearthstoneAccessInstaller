@@ -15,15 +15,13 @@ public class OperationPanel : FlowLayoutPanel
     {
         historyItems = new List<string>();
 
-        this.FlowDirection = FlowDirection.TopDown;
+        this.FlowDirection = FlowDirection.LeftToRight;
         this.AutoSize = true;
+        this.AutoSizeMode = AutoSizeMode.GrowAndShrink;
+        this.Padding = new Padding(10);
         this.WrapContents = false;
 
-        progressBar = new ProgressBar
-        {
-            Width = 50,
-            Height = 20
-        };
+        progressBar = new ProgressBar();
 
         label = new Label
         {
@@ -33,8 +31,7 @@ public class OperationPanel : FlowLayoutPanel
 
         listBox = new ListBox
         {
-            Width = 200,
-            Height = 100
+            IntegralHeight = true,
         };
 
 

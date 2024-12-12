@@ -18,8 +18,8 @@ public class Document
 public class TextViewerDialog : Form
 {
     private TextBox textBox;
-    private Button copyButton;
     private Button saveButton;
+    private Button copyButton;
     private Button closeButton;
 
     private Document document;
@@ -27,13 +27,17 @@ public class TextViewerDialog : Form
     public TextViewerDialog(Document document)
     {
         this.document = document;
+        this.AutoSize = true;
+        this.AutoSizeMode = AutoSizeMode.GrowAndShrink;
         this.StartPosition = FormStartPosition.CenterParent;
-        this.MinimumSize = new System.Drawing.Size(600, 400);
+        this.FormBorderStyle = FormBorderStyle.FixedDialog;
+        this.MinimizeBox = false;
+        this.MaximizeBox = false;
 
         FlowLayoutPanel mainPanel = new FlowLayoutPanel
         {
             FlowDirection = FlowDirection.TopDown,
-            Padding = new Padding(10),
+            Padding = new Padding(11),
             Dock = DockStyle.Fill,
             AutoSize = true,
             AutoSizeMode = AutoSizeMode.GrowOnly,
@@ -46,41 +50,46 @@ public class TextViewerDialog : Form
             ReadOnly = true,
             ScrollBars = ScrollBars.Vertical,
             MinimumSize = new System.Drawing.Size(500, 350),
+            BorderStyle = BorderStyle.FixedSingle,
             AccessibleRole = AccessibleRole.Document, // So that NVDA doesn't grab the text from it and set it to the description of the dialog, which causes lag.
         };
 
-        textBox.DeselectAll();
-
         // Buttons
-        copyButton = new Button { Text = "Copy to Clipboard" };
-        saveButton = new Button { Text = "Save" };
+        saveButton = new Button { Text = "Save", Margin = new Padding(6, 0, 0, 0) };
+        copyButton = new Button { Text = "Copy", Margin = new Padding(6, 0, 0, 0) };
         closeButton = new Button
         {
+            AutoSize = true,
+            Margin = new Padding(6, 0, 0, 0),
             Text = "Close",
-            DialogResult = DialogResult.Cancel
+            DialogResult = DialogResult.Cancel,
         };
 
-        copyButton.Click += CopyButton_Click;
         saveButton.Click += SaveButton_Click;
+        copyButton.Click += CopyButton_Click;
         closeButton.Click += (s, e) => this.Close();
 
         FlowLayoutPanel buttonPanel = new FlowLayoutPanel
         {
-            AutoSize = true,
             FlowDirection = FlowDirection.LeftToRight,
+            Anchor = AnchorStyles.Bottom | AnchorStyles.Right,
+            AutoSize = true,
+            AutoSizeMode = AutoSizeMode.GrowAndShrink,
+            WrapContents = false,
+            Padding = new Padding(5),
         };
 
-        buttonPanel.Controls.AddRange(new Control[] { copyButton, saveButton, closeButton });
+        buttonPanel.Controls.AddRange([saveButton, copyButton, closeButton]);
 
         mainPanel.Controls.Add(textBox);
         mainPanel.Controls.Add(buttonPanel);
 
         this.Controls.Add(mainPanel);
 
-        this.AcceptButton = closeButton;
         this.CancelButton = closeButton;
         this.Text = document.Title;
         textBox.Text = document.Content;
+        textBox.Select(0, 0);
     }
 
     private void CopyButton_Click(object? sender, EventArgs e)
@@ -132,9 +141,11 @@ public class DocumentPanel : FlowLayoutPanel
 {
     public DocumentPanel()
     {
+        this.FlowDirection = FlowDirection.LeftToRight;
         this.AutoSize = true;
         this.AutoSizeMode = AutoSizeMode.GrowAndShrink;
         this.WrapContents = false;
+        this.Padding = new Padding(10);
         this.Visible = false;
         this.Enabled = false;
     }
@@ -161,6 +172,7 @@ public class DocumentPanel : FlowLayoutPanel
             {
                 AutoSize = true,
                 Text = $"View {document.Title}",
+                Margin = new Padding(4, 0, 4, 0),
             };
 
             button.Click += (s, e) =>
