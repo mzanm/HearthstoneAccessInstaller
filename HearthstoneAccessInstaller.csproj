@@ -20,12 +20,6 @@
 
     <_SuppressWinFormsTrimError>true</_SuppressWinFormsTrimError>
 
-    <DebugType>none</DebugType>
-    <DebuggerSupport>false</DebuggerSupport>
-    <TrimmerRemoveSymbols>true</TrimmerRemoveSymbols>
-    <XmlResolverIsNetworkingEnabledByDefault>false</XmlResolverIsNetworkingEnabledByDefault>
-    <MetadataUpdaterSupport>false</MetadataUpdaterSupport>
-
   </PropertyGroup>
 
 </Project>
