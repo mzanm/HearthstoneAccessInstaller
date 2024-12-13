@@ -4,7 +4,7 @@ using System.IO;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Diagnostics;
-namespace HSAPatcher;
+namespace HearthstoneAccessInstaller;
 public class Downloader
 {
     private const int bufferSize = 65536;

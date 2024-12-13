@@ -1,7 +1,7 @@
 using System;
 using System.Windows.Forms;
 using System.IO;
-namespace HSAPatcher;
+namespace HearthstoneAccessInstaller;
 
 public class Document
 {

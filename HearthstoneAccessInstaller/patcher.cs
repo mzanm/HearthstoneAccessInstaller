@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
-namespace HSAPatcher;
+namespace HearthstoneAccessInstaller;
 static class Patcher
 {
     const string PATCH_DIR = "patch/";

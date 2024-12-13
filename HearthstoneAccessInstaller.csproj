@@ -5,7 +5,7 @@
     <TargetFramework>net9.0-windows</TargetFramework>
     <Nullable>enable</Nullable>
     <JsonSerializerIsReflectionEnabledByDefault>false</JsonSerializerIsReflectionEnabledByDefault>
-    <RootNamespace>HSAPatcher</RootNamespace>
+    <RootNamespace>HearthstoneAccessInstaller</RootNamespace>
     <UseWindowsForms>true</UseWindowsForms>
     <SatelliteResourceLanguages>en-US</SatelliteResourceLanguages>
   </PropertyGroup>
@@ -16,6 +16,8 @@
     <PublishSelfContained>true</PublishSelfContained>
     <PublishTrimmed>true</PublishTrimmed>
     <PublishAot>true</PublishAot>
+    <OptimizationPreference>Size</OptimizationPreference>
+
     <_SuppressWinFormsTrimError>true</_SuppressWinFormsTrimError>
 
     <DebugType>none</DebugType>

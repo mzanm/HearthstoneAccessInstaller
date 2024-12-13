@@ -3,7 +3,7 @@ using System.ComponentModel;
 using System.Collections.Generic;
 using System.Windows.Forms;
 using System.Windows.Forms.Automation;
-namespace HSAPatcher;
+namespace HearthstoneAccessInstaller;
 public class OperationPanel : FlowLayoutPanel
 {
     private ProgressBar progressBar;

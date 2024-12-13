@@ -1,5 +1,5 @@
 using System;
-namespace HSAPatcher;
+namespace HearthstoneAccessInstaller;
 public static class Utils
 {
     public static string GetElapsedTime(DateTimeOffset date)

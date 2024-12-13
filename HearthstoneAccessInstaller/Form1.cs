@@ -2,7 +2,7 @@ using System;
 using System.IO;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-namespace HSAPatcher;
+namespace HearthstoneAccessInstaller;
 public class MainForm : Form
 {
     private UpdateClient updateClient = null!;
@@ -25,7 +25,7 @@ public class MainForm : Form
 
     private void InitializeComponent()
     {
-        this.Text = "HSAPatcher - V 1.0";
+        this.Text = "Hearthstone Access Installer - V 1.0";
         this.AutoSize = true;
         this.AutoSizeMode = AutoSizeMode.GrowAndShrink;
         this.StartPosition = FormStartPosition.CenterScreen;

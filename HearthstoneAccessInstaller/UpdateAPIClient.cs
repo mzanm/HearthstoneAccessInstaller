@@ -6,7 +6,7 @@ using System.Text.Json.Serialization;
 using System.Net.Http;
 using System.Net.Http.Json;
 using System.Net.Http.Headers;
-namespace HSAPatcher;
+namespace HearthstoneAccessInstaller;
 public class Release
 {
     public string? Hearthstone_Version { get; set; }
