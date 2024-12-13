@@ -143,7 +143,9 @@ public class MainForm : Form
             }
             else
             {
-                item.SubItems.Add(uploadTime.Value.Date.ToString("d"));
+                DateTimeOffset offset = uploadTime.Value;
+                string relativeString = Utils.GetElapsedTime(offset);
+                item.SubItems.Add($"{offset.ToLocalTime().ToString("g")}, {relativeString}.");
             }
             string? changelog = channel.Latest_Release.Changelog;
             if (string.IsNullOrWhiteSpace(changelog))
