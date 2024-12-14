@@ -25,7 +25,7 @@ public class MainForm : Form
 
     private void InitializeComponent()
     {
-        this.Text = "Hearthstone Access Installer - V 1.0";
+        this.Text = "Hearthstone Access Installer - V 1.0.1";
         this.AutoSize = true;
         this.AutoSizeMode = AutoSizeMode.GrowAndShrink;
         this.StartPosition = FormStartPosition.CenterScreen;

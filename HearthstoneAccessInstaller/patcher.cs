@@ -61,7 +61,7 @@ static class Patcher
                     documents.Add(new Document(title, content));
                 }
             }
-            if (entryPath.StartsWith(PATCH_DIR, StringComparison.OrdinalIgnoreCase)) continue;
+            if (!entryPath.StartsWith(PATCH_DIR, StringComparison.OrdinalIgnoreCase)) continue;
             entryPath = entry.FullName.Substring(PATCH_DIR.Length);
             entryPath = Path.Join(entryPath.Split('/'));
             entryPath = Path.Join(directory, entryPath);
