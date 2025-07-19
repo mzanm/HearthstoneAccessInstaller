@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 namespace HearthstoneAccessInstaller;
+
 static class Patcher
 {
     const string PATCH_DIR = "patch/";
@@ -58,7 +59,11 @@ static class Patcher
                 using (StreamReader reader = new(entry.Open()))
                 {
                     string content = reader.ReadToEnd();
-                    documents.Add(new Document(title, content));
+                    if (!String.IsNullOrWhiteSpace(content))
+                    {
+                        documents.Add(new Document(title, content));
+                    }
+
                 }
             }
             if (!entryPath.StartsWith(PATCH_DIR, StringComparison.OrdinalIgnoreCase)) continue;

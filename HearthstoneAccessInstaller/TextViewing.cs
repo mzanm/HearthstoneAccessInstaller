@@ -43,7 +43,6 @@ public class TextViewerDialog : Form
             AutoSizeMode = AutoSizeMode.GrowOnly,
         };
 
-        // TextBox
         textBox = new TextBox
         {
             Multiline = true,
@@ -54,7 +53,6 @@ public class TextViewerDialog : Form
             AccessibleRole = AccessibleRole.Document, // So that NVDA doesn't grab the text from it and set it to the description of the dialog, which causes lag.
         };
 
-        // Buttons
         saveButton = new Button { Text = "Save", Margin = new Padding(6, 0, 0, 0) };
         copyButton = new Button { Text = "Copy", Margin = new Padding(6, 0, 0, 0) };
         closeButton = new Button
@@ -88,7 +86,7 @@ public class TextViewerDialog : Form
 
         this.CancelButton = closeButton;
         this.Text = document.Title;
-        textBox.Text = document.Content;
+        textBox.Text = document.Content.ReplaceLineEndings();
         textBox.Select(0, 0);
     }
 
